@@ -2,6 +2,11 @@
 Hank DeDona
 7/23/2022
 
-This project is built using the basics of spring boot v2.7.2 and is designed to connect to a MySQL database running on localhost port 3306.
+This project is built using the basics of spring boot v2.7.2 and is designed to run on a tomcat container on port 8080.
 
-The web service will run on port 8080 when started up, see com.notable.health.nhtest.NhTestApplication.java to start.
+To start, you can simply run the com.notable.health.nhtest.NhTestApplication.java class
+
+
+Thoughts/Notes
+
+There is so much missing, full test suites, better documentation, authentication/authorization, CSRF protection, etc.
