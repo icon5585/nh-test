@@ -25,3 +25,6 @@ hs_err_pid*
 
 #Mac specific files
 .DS_Store
+
+#Eclipse
+.settings
