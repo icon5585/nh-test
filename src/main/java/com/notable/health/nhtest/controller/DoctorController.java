@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -60,8 +63,65 @@ public class DoctorController {
 	 */
 	@GetMapping
 	@RequestMapping("/{id}")
-	public Doctor getDoctorById(@PathVariable Integer id) {
+	public Doctor getDoctorById(@PathVariable Integer id, @RequestHeader("X-User-Id") String userId,
+			@RequestHeader("X-User-Role") String userRole) {
+		// Authentication here
+		if(userRole.equalsIgnoreCase("admin")) {
+			return getDoctor(id);
+		} else if (userRole.equalsIgnoreCase("doctor")) {
+			// Check
+			if(!Integer.valueOf(userId).equals(id)) {
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized!");
+			}
+		} else {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unknown role!");
+		}
+		
 		return getDoctor(id);
+	}
+
+	// Update an appointment
+	// appointment_id
+	// patient first name
+	// patient last name
+	// appointment type
+	// when it starts (start date time)
+	// duration
+
+	/**
+	 * 
+	 */
+	@PutMapping
+	@RequestMapping(value = "/{id}/appointments/{appointmentId}", method = RequestMethod.PUT)
+	@ResponseStatus(HttpStatus.OK)
+	public String updateDoctorAppointmentById(@PathVariable Integer id, @PathVariable Integer appointmentId,
+			@ModelAttribute @Valid AppointmentRequest appointmentRequest) {
+		// Find doctor
+		Doctor doctorToFind = getDoctor(id);
+
+		// Find existing appointment
+		Appointment appt = doctorToFind.getAppointmentById(appointmentId);
+		if (appt == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+					String.format("Appointment with ID %d not found", appointmentId));
+		}
+
+		// Should have existing appointment here
+		// Delete existing appointment
+		doctorToFind.deleteAppointmentById(appointmentId);
+
+		// Should I just pass in my "new" appointment request object?
+		appt = new Appointment(appointmentRequest, appointmentId);
+
+		// Add appt back to doctor
+		doctorToFind.addAppointment(appt);
+
+		// Save it
+		DoctorRepository.saveDoctor(doctorToFind);
+
+		// How to update doctor? Decouple appointments from doctors
+
+		return String.format("Successfully updated appointment with ID %d", appointmentId);
 	}
 
 	// TODO /appointments for all appoinments for a given doctor
@@ -114,7 +174,7 @@ public class DoctorController {
 	 *                                 {@link Appointment} is found
 	 */
 	@DeleteMapping
-	@RequestMapping("/{id}/appointments/{appointmentId}")
+	@RequestMapping(value = "/{id}/appointments/{appointmentId}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
 	public String deleteDoctorAppointmentById(@PathVariable Integer id, @PathVariable Integer appointmentId) {
 		// Find doctor

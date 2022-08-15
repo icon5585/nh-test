@@ -65,6 +65,8 @@ public class AppointmentRequest {
 	@NotNull
 	private AppointmentType appointmentType;
 
+	
+	
 	public void setPatientFirstName(String patientFirstName) {
 		this.patientFirstName = patientFirstName;
 	}

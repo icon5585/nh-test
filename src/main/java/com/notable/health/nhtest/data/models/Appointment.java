@@ -38,9 +38,8 @@ public class Appointment {
 		this.durationInMinutes = durationInMinutes;
 	}
 
-	public Appointment(AppointmentRequest appointmentRequest) {
-		id = IdGenerator.getNextNumber();
-
+	public Appointment(AppointmentRequest appointmentRequest, int id) {
+		this.id = id;
 		Patient newPatient = null;
 
 		switch (appointmentRequest.getAppointmentType()) {
@@ -58,6 +57,10 @@ public class Appointment {
 		this.startDateTime = LocalDateTime.of(appointmentRequest.getYear(), appointmentRequest.getMonth(),
 				appointmentRequest.getDay(), appointmentRequest.getHour(), appointmentRequest.getMinute());
 		this.durationInMinutes = appointmentRequest.getDurationInMinutes();
+	}
+
+	public Appointment(AppointmentRequest appointmentRequest) {
+		this(appointmentRequest, IdGenerator.getNextNumber());
 
 	}
 
