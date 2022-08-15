@@ -1,4 +1,4 @@
-package com.notable.health.nhtest.controller.mock;
+package com.notable.health.nhtest.mock;
 
 import java.time.LocalDateTime;
 
